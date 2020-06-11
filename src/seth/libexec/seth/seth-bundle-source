@@ -20,7 +20,7 @@ OPT=$(echo "$SRC" | jq '.OptimizationUsed' | seth --show-json)
 NAME=$(echo "$SRC" | jq '.ContractName' | seth --show-json)
 if [[ "$OPT" -ne  0 ]]; then
     RUNS=$(echo "$SRC" | jq '.Runs')
-    export SOLC_FLAGS="--optimize optimize-runs="$RUNS""
+    export SOLC_FLAGS="--optimize optimize-runs=$RUNS"
 fi
     
 srcfile=$(TMPDIR=. mktemp "$NAME".XXXXX)

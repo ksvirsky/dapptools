@@ -8,7 +8,6 @@
 ### Unless `--no-src` is given, source code for the `to` address
 ### will be passed along to hevm for better debugging xp
 
-# Make temporary state directory
 set -e
 
 state=$(TMPDIR=. mktemp -d hevm.libs.XXXXX)
@@ -28,14 +27,12 @@ opts=()
 if [[ -z "$SETH_NOSRC" ]]; then
   echo "fetching contract source from etherscan..."
   COMBINEDJSON=$(TMPDIR=. mktemp)
-  set +e
-  seth bundle-source "$(echo "$targetTx" | seth --field to)" > "$COMBINEDJSON"
-  if [[ -n $? ]]; then
+  if seth bundle-source "$(echo "$targetTx" | seth --field to)" > "$COMBINEDJSON"
+  then
       opts+=(--source "$COMBINEDJSON")
   else
       echo "no source available"
   fi
-  set -e
 fi
 
 txs=($(seth block "$(echo "$targetTx" | seth --field blockNumber)" --full | seth --field transactions | seth --show-json))
@@ -54,7 +51,7 @@ for i in "${txs[@]}"; do
    else
      echo -en "\rtransaction ($j/$index)"
      # exit code 2 means REVERT or otherwise ok failure
-     res=$(seth run-tx "$tx" --state "$state") || ([[ $? == 2 ]] || seth --fail "hevm error while executing tx: $hash")
+     seth run-tx "$tx" --state "$state" > /dev/null || ([[ $? == 2 ]] || seth --fail "hevm error while executing tx: $hash")
      j=$((j + 1))
    fi
 done
