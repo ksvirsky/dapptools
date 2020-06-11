@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+### seth-bundle-source -- fetch source and compile contract
+### Usage: seth bundle-source <address> [<options>]
+###
+### Requires an etherscan api key
+###
+
+# not really sure why this is a list
+# seems like we always just want the first element
+set -e
+SRC=$(seth source "$1" | jq '.[0]')
+
+SOLC_VERSION=$(echo "$SRC" | jq '.CompilerVersion')
+SOLC_VERSION=${SOLC_VERSION/'"'}
+SOLC_VERSION=${SOLC_VERSION/v}
+SOLC_VERSION=${SOLC_VERSION/+*}
+
+SRC=$(echo "$SRC" | jq '.SourceCode')
+srcfile=$(TMPDIR=. mktemp)
+echo "$SRC" | seth --show-json > "$srcfile"
+dapp --use solc:"${SOLC_VERSION}" combined-json "$srcfile"
