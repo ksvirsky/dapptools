@@ -10,7 +10,7 @@
 
 # Make temporary state directory
 set -e
-set -x
+
 state=$(TMPDIR=. mktemp -d hevm.libs.XXXXX)
 
 export GIT_CONFIG_NOSYSTEM=1
