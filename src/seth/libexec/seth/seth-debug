@@ -50,8 +50,8 @@ for i in "${txs[@]}"; do
      break
    else
      echo -en "\rtransaction ($j/$index)"
-     # exit code 2 means REVERT or otherwise ok failure
-     seth run-tx "$tx" --state "$state" > /dev/null || ([[ $? == 2 ]] || seth --fail "hevm error while executing tx: $hash")
+     # exit code 2 means REVERT or otherwise acceptable failure
+     seth run-tx "$tx" --state "$state" > /dev/null || [[ $? == 2 ]] || seth --fail "hevm error while executing tx: $hash"
      j=$((j + 1))
    fi
 done
